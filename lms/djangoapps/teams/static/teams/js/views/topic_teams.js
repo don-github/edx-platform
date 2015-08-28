@@ -15,6 +15,7 @@
                 },
 
                 initialize: function(options) {
+                    this.showSortControls = options.showSortControls;
                     TeamsView.prototype.initialize.call(this, options);
                 },
 
@@ -57,14 +58,14 @@
 
                 showCreateTeamForm: function (event) {
                     event.preventDefault();
-                    Backbone.history.navigate('topics/' + this.teamParams.topicID + '/create-team', {trigger: true});
+                    Backbone.history.navigate('topics/' + this.model.id + '/create-team', {trigger: true});
                 },
 
                 createHeaderView: function () {
                     return new PagingHeader({
                         collection: this.options.collection,
                         srInfo: this.srInfo,
-                        showSortControls: true
+                        showSortControls: this.showSortControls
                     });
                 }
             });

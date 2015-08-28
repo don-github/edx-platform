@@ -3,9 +3,6 @@
 Teams pages.
 """
 
-from bok_choy.javascript import wait_for_js
-from bok_choy.promise import EmptyPromise
-
 from .course_page import CoursePage
 from .discussion import InlineDiscussionPage
 from ..common.paging import PaginatedUIMixin
@@ -145,6 +142,11 @@ class BrowseTopicsPage(CoursePage, PaginatedUIMixin):
         """Return a list of the topic names present on the page."""
         return self.q(css=CARD_TITLE_CSS).map(lambda e: e.text).results
 
+    @property
+    def topic_descriptions(self):
+        """Return a list of the topic descriptions present on the page."""
+        return self.q(css='p.card-description').map(lambda e: e.text).results
+
     def browse_teams_for_topic(self, topic_name):
         """
         Show the teams list for `topic_name`.
@@ -162,36 +164,32 @@ class BrowseTopicsPage(CoursePage, PaginatedUIMixin):
         self.wait_for_ajax()
 
 
-class BrowseTeamsPage(CoursePage, PaginatedUIMixin, TeamCardsMixin):
+class BaseTeamsPage(CoursePage, PaginatedUIMixin, TeamCardsMixin):
     """
     The paginated UI for browsing teams within a Topic on the Teams
     page.
     """
     def __init__(self, browser, course_id, topic):
         """
-        Set up `self.url_path` on instantiation, since it dynamically
-        reflects the current topic.  Note that `topic` is a dict
-        representation of a topic following the same convention as a
-        course module's topic.
+        Note that `topic` is a dict representation of a topic following
+        the same convention as a course module's topic.
         """
-        super(BrowseTeamsPage, self).__init__(browser, course_id)
+        super(BaseTeamsPage, self).__init__(browser, course_id)
         self.topic = topic
-        self.url_path = "teams/#topics/{topic_id}".format(topic_id=self.topic['id'])
 
     def is_browser_on_page(self):
-        """Check if we're on the teams list page for a particular topic."""
-        self.wait_for_element_presence('.team-actions', 'Wait for the bottom links to be present')
+        """Check if we're on a teams list page for a particular topic."""
         has_correct_url = self.url.endswith(self.url_path)
         teams_list_view_present = self.q(css='.teams-main').present
         return has_correct_url and teams_list_view_present
 
     @property
-    def header_topic_name(self):
+    def header_name(self):
         """Get the topic name displayed by the page header"""
         return self.q(css=TEAMS_HEADER_CSS + ' .page-title')[0].text
 
     @property
-    def header_topic_description(self):
+    def header_description(self):
         """Get the topic description displayed by the page header"""
         return self.q(css=TEAMS_HEADER_CSS + ' .page-description')[0].text
 
@@ -232,24 +230,47 @@ class BrowseTeamsPage(CoursePage, PaginatedUIMixin, TeamCardsMixin):
         ).click()
         self.wait_for_ajax()
 
+    @property
     def _showing_search_results(self):
         """
         Returns true if showing search results.
         """
-        return self.header_topic_description.startswith(u"Showing results for")
+        return self.header_description.startswith(u"Showing results for")
 
     def search(self, string):
-        """ Search for the specified string. """
+        """
+        Searches for the specified string, and returns a SearchTeamsPage
+        representing the search results page.
+        """
         self.q(css='.search-field').first.fill(string)
         self.q(css='.action-search').first.click()
-        EmptyPromise(self._showing_search_results, u"Showing search results").fulfill()
+        self.wait_for(
+            lambda: self._showing_search_results,
+            description="Showing search results"
+        )
+        page = SearchTeamsPage(self.browser, self.course_id, self.topic)
+        page.wait_for_page()
+        return page
 
-    @wait_for_js
-    def search_field_has_focus(self):
-        """
-        Returns true if the search field has focus.
-        """
-        return self.browser.execute_script("return $('{}').is(':focus')".format('.search-field'))
+
+class BrowseTeamsPage(BaseTeamsPage):
+    """
+    The paginated UI for browsing teams within a Topic on the Teams
+    page.
+    """
+    def __init__(self, browser, course_id, topic):
+        super(BrowseTeamsPage, self).__init__(browser, course_id, topic)
+        self.url_path = "teams/#topics/{topic_id}".format(topic_id=self.topic['id'])
+
+
+class SearchTeamsPage(BaseTeamsPage):
+    """
+    The paginated UI for showing team search results.
+    page.
+    """
+    def __init__(self, browser, course_id, topic):
+        super(SearchTeamsPage, self).__init__(browser, course_id, topic)
+        self.url_path = "teams/#topics/{topic_id}/search".format(topic_id=self.topic['id'])
 
 
 class CreateOrEditTeamPage(CoursePage, FieldsMixin):
