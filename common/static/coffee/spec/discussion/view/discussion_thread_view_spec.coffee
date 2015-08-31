@@ -66,8 +66,9 @@ describe "DiscussionThreadView", ->
 
         checkForTopicFocus = (originallyClosed, mode) ->
             view = createDiscussionThreadView(originallyClosed, mode)
-            console.log(view.$('.discussion-article').selector);
-            expect(view.$('.discussion-article').selector).toHaveFocus()
+            waitsFor (->
+                view.$(".discussion-article").selector.activeElement
+            ), "conversation did not receive focus", 5000
 
         it "sends focus to the conversation when opened", ->
             checkForTopicFocus()
