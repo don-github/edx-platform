@@ -107,6 +107,7 @@ END
         ;;
 
     "commonlib-unit")
+        export DJANGO_SETTINGS_MODULE='lms.envs.dev'
         paver test_lib --extra_args="--with-flaky" --cov_args="-p"
         ;;
 
