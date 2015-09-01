@@ -522,6 +522,10 @@
 
     .signatory-panel-body {
       padding: $baseline;
+
+      .signatory-image {
+        margin-top: 20px;
+      }
     }
 
     .signatory-panel-body label {
