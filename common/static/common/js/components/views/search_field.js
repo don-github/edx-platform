@@ -12,7 +12,8 @@
 
                 events: {
                     'submit .search-form': 'performSearch',
-                    'blur .search-form': 'performSearch',
+                    'blur .search-form': 'onFocusOut',
+                    'keyup .search-field': 'refreshState',
                     'click .action-clear': 'clearSearch'
                 },
 
@@ -21,13 +22,33 @@
                     this.label = options.label;
                 },
 
+                refreshState: function() {
+                    var searchField = this.$('.search-field'),
+                        clearButton = this.$('.action-clear'),
+                        searchString = $.trim(searchField.val());
+                    if (searchString) {
+                        clearButton.removeClass('is-hidden');
+                    } else {
+                        clearButton.addClass('is-hidden');
+                    }
+                },
+
                 render: function() {
                     this.$el.html(_.template(searchFieldTemplate, {
                         type: this.type,
                         searchString: this.collection.searchString,
                         searchLabel: this.label
                     }));
+                    this.refreshState();
                     return this;
+                },
+
+                onFocusOut: function(event) {
+                    // If the focus is going anywhere but the clear search
+                    // button then treat it as a request to search.
+                    if (!$(event.relatedTarget).hasClass('action-clear')) {
+                        this.performSearch(event);
+                    }
                 },
 
                 performSearch: function(event) {
@@ -40,7 +61,9 @@
 
                 clearSearch: function(event) {
                     event.preventDefault();
+                    this.$('.search-field').val('');
                     this.collection.setSearchString('');
+                    this.refreshState();
                     return this.collection.refresh();
                 }
             });

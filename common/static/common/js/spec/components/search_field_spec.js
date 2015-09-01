@@ -48,6 +48,7 @@ define([
         it('correctly displays itself', function () {
             searchFieldView = createSearchFieldView().render();
             expect(searchFieldView.$('.search-field').val(), '');
+            expect(searchFieldView.$('.action-clear')).toHaveClass('is-hidden');
         });
 
         it('can display with an initial search string', function () {
@@ -55,6 +56,7 @@ define([
                 searchString: 'foo'
             }).render();
             expect(searchFieldView.$('.search-field').val(), 'foo');
+            expect(searchFieldView.$('.action-clear')).not.toHaveClass('is-hidden');
         });
 
         it('refreshes the collection when performing a search', function () {
@@ -76,6 +78,7 @@ define([
                 results: []
             });
             expect(searchFieldView.$('.search-field').val(), 'foo');
+            expect(searchFieldView.$('.action-clear')).not.toHaveClass('is-hidden');
         });
 
         it('can clear the search', function () {
@@ -98,6 +101,7 @@ define([
                 results: []
             });
             expect(searchFieldView.$('.search-field').val(), '');
+            expect(searchFieldView.$('.action-clear')).toHaveClass('is-hidden');
         });
     });
 });
