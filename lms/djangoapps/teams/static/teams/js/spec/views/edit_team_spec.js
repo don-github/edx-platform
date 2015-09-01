@@ -134,7 +134,7 @@ define([
             teamEditView.$('.create-team.form-actions .action-primary').click();
 
             AjaxHelpers.expectJsonRequest(requests, requestMethod(), teamsUrl, teamsData);
-            AjaxHelpers.respondWithJson(requests, _.extend(_.extend({}, teamsData), teamAction === 'create' ? {id: '123'} : {}));
+            AjaxHelpers.respondWithJson(requests, _.extend({}, teamsData, teamAction === 'create' ? {id: '123'} : {}));
 
             expect(teamEditView.$('.create-team.wrapper-msg .copy').text().trim().length).toBe(0);
             expect(Backbone.history.navigate.calls[0].args).toContain(expectedUrl);

@@ -86,7 +86,9 @@ define([
                 sort_order: 'last_activity_at',
                 results: teamMembershipData
             },
-            _.extend(_.extend({}, {
+            _.extend(
+                {},
+                {
                     teamEvents: teamEvents,
                     course_id: testCourseID,
                     parse: true,
@@ -94,8 +96,9 @@ define([
                     username: testUser,
                     privileged: false,
                     staff: false
-                }),
-                options)
+                },
+                options
+            )
         );
     };
 
@@ -107,7 +110,7 @@ define([
                 staff: false,
                 team_memberships_data: createMockTeamMembershipsData(1, 5)
             },
-            options || {}
+            options
         );
     };
 
@@ -147,7 +150,7 @@ define([
                 group_id: 1,
                 endorsed: false
             },
-            options || {}
+            options
         );
     };
 
@@ -231,7 +234,7 @@ define([
                 context: "standalone",
                 endorsed: false
             },
-            options || {}
+            options
         );
     };
 
@@ -253,7 +256,7 @@ define([
                 name: 'Test Topic 1',
                 description: 'Test description 1'
             },
-            options || {}
+            options
         ));
     };
 
@@ -278,7 +281,7 @@ define([
     };
 
     var createMockContext = function(options) {
-        return _.extend(_.extend({}, testContext), options);
+        return _.extend({}, testContext, options);
     };
 
     createMockTopicCollection = function (topicData) {

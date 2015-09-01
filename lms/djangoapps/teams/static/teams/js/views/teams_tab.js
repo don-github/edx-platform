@@ -384,12 +384,12 @@
                             title: topic.get('name'),
                             url: '#topics/' + topic.id
                         });
-                    }
-                    if (topic && team) {
-                        breadcrumbs.push({
-                            title: team.get('name'),
-                            url: '#teams/' + topic.id + '/' + team.id
-                        });
+                        if (team) {
+                            breadcrumbs.push({
+                                title: team.get('name'),
+                                url: '#teams/' + topic.id + '/' + team.id
+                            });
+                        }
                     }
                     return breadcrumbs;
                 },

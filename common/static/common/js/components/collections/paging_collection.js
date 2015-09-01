@@ -105,13 +105,11 @@
 
             /**
              * Refreshes the collection if it has been marked as stale.
-             * @param force If true, it will always refresh.
              * @returns {promise} Returns a promise representing the refresh.
              */
-            refresh: function(force) {
-                var self = this,
-                    deferred = $.Deferred();
-                if (force || this.isStale) {
+            refresh: function() {
+                var deferred = $.Deferred();
+                if (this.isStale) {
                     this.setPage(1)
                         .done(function() {
                             deferred.resolve();

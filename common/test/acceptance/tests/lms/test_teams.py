@@ -519,7 +519,8 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         Verify that we are on the correct team list page.
 
         Arguments:
-            page_num (int): The one-indexed page we expect to be on
+            page (BaseTeamsPage): The teams page object that should be the current page.
+            page_num (int): The one-indexed page number that we expect to be on
             total_teams (list): An unsorted list of all the teams for the
                 current topic
             pagination_header_text (str): Text we expect to see in the

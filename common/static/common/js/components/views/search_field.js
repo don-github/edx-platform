@@ -20,7 +20,6 @@
                     Backbone.View.prototype.initialize.call(this, options);
                     this.type = options.type;
                     this.label = options.label;
-                    _.bindAll(this, 'performSearch');
                 },
 
                 render: function() {
