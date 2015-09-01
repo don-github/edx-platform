@@ -519,7 +519,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         Verify that we are on the correct team list page.
 
         Arguments:
-            page (BaseTeamsPage): The teams page object that should be the current page.
+            teams_page (BaseTeamsPage): The teams page object that should be the current page.
             page_num (int): The one-indexed page number that we expect to be on
             total_teams (list): An unsorted list of all the teams for the
                 current topic
@@ -688,15 +688,13 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
     def test_browse_team_topics(self):
         """
         Scenario: User should be able to navigate to "browse all teams" and "search team description" links.
-        Given I am enrolled in a course with a team configuration and a topic
-            containing one team
-        When I visit the Teams page for that topic
+        Given I am enrolled in a course with teams enabled
+        When I visit the Teams page for a topic
         Then I should see the correct page header
         And I should see the link to "browse teams in other topics"
         When I should navigate to that link
         Then I should see the topic browse page
         """
-        self.create_teams(self.topic, self.TEAMS_PAGE_SIZE + 10)
         self.browse_teams_page.visit()
         self.verify_page_header()
 
@@ -706,8 +704,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
     def test_search(self):
         """
         Scenario: User should be able to search for a team
-        Given I am enrolled in a course with a team configuration and a topic
-            containing one team
+        Given I am enrolled in a course with teams enabled
         When I visit the Teams page for that topic
         And I search for 'banana'
         Then I should see the search result page

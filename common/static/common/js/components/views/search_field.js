@@ -6,8 +6,8 @@
 ;(function (define) {
     'use strict';
 
-    define(['backbone', 'underscore', 'text!common/templates/components/search-field.underscore'],
-        function (Backbone, _, searchFieldTemplate) {
+    define(['backbone', 'jquery', 'underscore', 'text!common/templates/components/search-field.underscore'],
+        function (Backbone, $, _, searchFieldTemplate) {
             return Backbone.View.extend({
 
                 events: {
@@ -17,7 +17,6 @@
                 },
 
                 initialize: function(options) {
-                    Backbone.View.prototype.initialize.call(this, options);
                     this.type = options.type;
                     this.label = options.label;
                 },

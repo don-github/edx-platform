@@ -24,7 +24,7 @@ define([
                 options = {showActions: true};
             }
             var expectedTitle = 'Are you having trouble finding a team to join?',
-                expectedMessage = 'Browse teams in other topics or search team descriptions in this topic. ' +
+                expectedMessage = 'Browse teams in other topics or search teams in this topic. ' +
                     'If you still can\'t find a team to join, create a new team in this topic.',
                 title = teamsView.$('.title').text().trim(),
                 message = teamsView.$('.copy').text().trim();
