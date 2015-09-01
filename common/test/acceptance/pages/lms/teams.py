@@ -138,6 +138,12 @@ class BrowseTopicsPage(CoursePage, PaginatedUIMixin):
         return self.q(css=TOPIC_CARD_CSS).results
 
     @property
+    def topic_team_counts(self):
+        """Return a dict of topic name to team count on the page."""
+        counts = self.q(css='p.team-count').map(lambda e: int(e.text.split()[0])).results
+        return dict(zip(self.topic_names, counts))
+
+    @property
     def topic_names(self):
         """Return a list of the topic names present on the page."""
         return self.q(css=CARD_TITLE_CSS).map(lambda e: e.text).results
@@ -234,8 +240,13 @@ class BrowseTeamsPage(CoursePage, PaginatedUIMixin, TeamCardsMixin):
         ).click()
         self.wait_for_ajax()
 
+    def click_all_topics_link(self):
+        """Click the 'All Topics' breadcrumb."""
+        self.q(css='a.nav-item').first.click()
+        self.wait_for_ajax()
 
-class CreateEditDeleteTeamPage(CoursePage, FieldsMixin):
+
+class TeamManagementPage(CoursePage, FieldsMixin):
     """
     Team page for creation, editing, and deletion.
     """
@@ -246,7 +257,7 @@ class CreateEditDeleteTeamPage(CoursePage, FieldsMixin):
         representation of a topic following the same convention as a
         course module's topic.
         """
-        super(CreateEditDeleteTeamPage, self).__init__(browser, course_id)
+        super(TeamManagementPage, self).__init__(browser, course_id)
         self.topic = topic
         self.url_path = "teams/#topics/{topic_id}/create-team".format(topic_id=self.topic['id'])
 
@@ -290,15 +301,6 @@ class CreateEditDeleteTeamPage(CoursePage, FieldsMixin):
     def delete_team_button(self):
         """Returns the 'delete team' button."""
         return self.q(css='.action-delete').first
-
-    def confirm_delete_team_dialog(self):
-        """Click 'delete' on the warning dialog."""
-        confirm_prompt(self, require_notification=False)
-        self.wait_for_ajax()
-
-    def cancel_delete_team_dialog(self):
-        """Click 'delete' on the warning dialog."""
-        confirm_prompt(self, cancel=True)
 
 
 class TeamPage(CoursePage, PaginatedUIMixin):

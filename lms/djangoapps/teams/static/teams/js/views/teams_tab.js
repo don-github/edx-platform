@@ -251,8 +251,7 @@
                             });
                             var instructorToolsView = new InstructorToolsView({
                                 team: team,
-                                teamEvents: self.teamEvents,
-                                router: self.router
+                                teamEvents: self.teamEvents
                             });
                             editViewWithHeader = self.createViewWithHeader({
                                     mainView: view,

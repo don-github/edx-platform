@@ -27,9 +27,10 @@ from ...pages.lms.teams import (
     MyTeamsPage,
     BrowseTopicsPage,
     BrowseTeamsPage,
-    CreateEditDeleteTeamPage,
+    TeamManagementPage,
     TeamPage
 )
+from ...pages.studio.utils import confirm_prompt
 
 
 TOPICS_PER_PAGE = 12
@@ -341,7 +342,7 @@ class BrowseTopicsTest(TeamsTabBase):
         browse_teams_page = BrowseTeamsPage(self.browser, self.course_id, topic)
         self.assertTrue(browse_teams_page.is_browser_on_page())
         browse_teams_page.click_create_team_link()
-        create_team_page = CreateEditDeleteTeamPage(self.browser, self.course_id, topic)
+        create_team_page = TeamManagementPage(self.browser, self.course_id, topic)
         create_team_page.value_for_text_field(field_id='name', value='Team Name', press_enter=False)
         create_team_page.value_for_textarea_field(
             field_id='description',
@@ -724,9 +725,9 @@ class TeamFormActions(TeamsTabBase):
         Verify that the page header correctly reflects the
         create team header, description and breadcrumb.
         """
-        self.assertEqual(self.create_edit_delete_team_page.header_page_name, title)
-        self.assertEqual(self.create_edit_delete_team_page.header_page_description, description)
-        self.assertEqual(self.create_edit_delete_team_page.header_page_breadcrumbs, breadcrumbs)
+        self.assertEqual(self.team_management_page.header_page_name, title)
+        self.assertEqual(self.team_management_page.header_page_description, description)
+        self.assertEqual(self.team_management_page.header_page_breadcrumbs, breadcrumbs)
 
     def verify_and_navigate_to_create_team_page(self):
         """Navigates to the create team page and verifies."""
@@ -746,7 +747,7 @@ class TeamFormActions(TeamsTabBase):
 
         self.team_page.click_edit_team_button()
 
-        self.create_edit_delete_team_page.wait_for_page()
+        self.team_management_page.wait_for_page()
 
         # Edit page header.
         self.verify_page_header(
@@ -769,37 +770,37 @@ class TeamFormActions(TeamsTabBase):
 
     def fill_create_or_edit_form(self):
         """Fill the create/edit team form fields with appropriate values."""
-        self.create_edit_delete_team_page.value_for_text_field(
+        self.team_management_page.value_for_text_field(
             field_id='name',
             value=self.TEAMS_NAME,
             press_enter=False
         )
-        self.create_edit_delete_team_page.value_for_textarea_field(
+        self.team_management_page.value_for_textarea_field(
             field_id='description',
             value=self.TEAM_DESCRIPTION
         )
-        self.create_edit_delete_team_page.value_for_dropdown_field(field_id='language', value='English')
-        self.create_edit_delete_team_page.value_for_dropdown_field(field_id='country', value='Pakistan')
+        self.team_management_page.value_for_dropdown_field(field_id='language', value='English')
+        self.team_management_page.value_for_dropdown_field(field_id='country', value='Pakistan')
 
     def verify_all_fields_exist(self):
         """
         Verify the fields for create/edit page.
         """
         self.assertEqual(
-            self.create_edit_delete_team_page.message_for_field('name'),
+            self.team_management_page.message_for_field('name'),
             'A name that identifies your team (maximum 255 characters).'
         )
         self.assertEqual(
-            self.create_edit_delete_team_page.message_for_textarea_field('description'),
+            self.team_management_page.message_for_textarea_field('description'),
             'A short description of the team to help other learners understand '
             'the goals or direction of the team (maximum 300 characters).'
         )
         self.assertEqual(
-            self.create_edit_delete_team_page.message_for_field('country'),
+            self.team_management_page.message_for_field('country'),
             'The country that team members primarily identify with.'
         )
         self.assertEqual(
-            self.create_edit_delete_team_page.message_for_field('language'),
+            self.team_management_page.message_for_field('language'),
             'The language that team members primarily use to communicate with each other.'
         )
 
@@ -814,7 +815,7 @@ class CreateTeamTest(TeamFormActions):
         super(CreateTeamTest, self).setUp()
         self.set_team_configuration({'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]})
 
-        self.create_edit_delete_team_page = CreateEditDeleteTeamPage(self.browser, self.course_id, self.topic)
+        self.team_management_page = TeamManagementPage(self.browser, self.course_id, self.topic)
         self.browse_teams_page = BrowseTeamsPage(self.browser, self.course_id, self.topic)
         self.browse_teams_page.visit()
 
@@ -842,14 +843,14 @@ class CreateTeamTest(TeamFormActions):
         Then I should see the error message and highlighted fields.
         """
         self.verify_and_navigate_to_create_team_page()
-        self.create_edit_delete_team_page.submit_form()
+        self.team_management_page.submit_form()
 
         self.assertEqual(
-            self.create_edit_delete_team_page.validation_message_text,
+            self.team_management_page.validation_message_text,
             'Check the highlighted fields below and try again.'
         )
-        self.assertTrue(self.create_edit_delete_team_page.error_for_field(field_id='name'))
-        self.assertTrue(self.create_edit_delete_team_page.error_for_field(field_id='description'))
+        self.assertTrue(self.team_management_page.error_for_field(field_id='name'))
+        self.assertTrue(self.team_management_page.error_for_field(field_id='description'))
 
     def test_user_can_see_error_message_for_incorrect_data(self):
         """
@@ -864,7 +865,7 @@ class CreateTeamTest(TeamFormActions):
         self.verify_and_navigate_to_create_team_page()
 
         # Fill the name field with >255 characters to see validation message.
-        self.create_edit_delete_team_page.value_for_text_field(
+        self.team_management_page.value_for_text_field(
             field_id='name',
             value='EdX is a massive open online course (MOOC) provider and online learning platform. '
                   'It hosts online university-level courses in a wide range of disciplines to a worldwide '
@@ -876,13 +877,13 @@ class CreateTeamTest(TeamFormActions):
                   'edX has more than 4 million users taking more than 500 courses online.',
             press_enter=False
         )
-        self.create_edit_delete_team_page.submit_form()
+        self.team_management_page.submit_form()
 
         self.assertEqual(
-            self.create_edit_delete_team_page.validation_message_text,
+            self.team_management_page.validation_message_text,
             'Check the highlighted fields below and try again.'
         )
-        self.assertTrue(self.create_edit_delete_team_page.error_for_field(field_id='name'))
+        self.assertTrue(self.team_management_page.error_for_field(field_id='name'))
 
     def test_user_can_create_new_team_successfully(self):
         """
@@ -904,7 +905,7 @@ class CreateTeamTest(TeamFormActions):
         self.verify_and_navigate_to_create_team_page()
 
         self.fill_create_or_edit_form()
-        self.create_edit_delete_team_page.submit_form()
+        self.team_management_page.submit_form()
 
         # Verify that the page is shown for the new team
         team_page = TeamPage(self.browser, self.course_id)
@@ -936,7 +937,7 @@ class CreateTeamTest(TeamFormActions):
         self.assertTrue(self.browse_teams_page.get_pagination_header_text().startswith('Showing 0 out of 0 total'))
 
         self.verify_and_navigate_to_create_team_page()
-        self.create_edit_delete_team_page.cancel_team()
+        self.team_management_page.cancel_team()
 
         self.assertTrue(self.browse_teams_page.is_browser_on_page())
         self.assertTrue(self.browse_teams_page.get_pagination_header_text().startswith('Showing 0 out of 0 total'))
@@ -960,7 +961,7 @@ class DeleteTeamTest(TeamFormActions):
             {'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]},
             global_staff=True
         )
-        self.create_edit_delete_team_page = CreateEditDeleteTeamPage(self.browser, self.course_id, self.topic)
+        self.team_management_page = TeamManagementPage(self.browser, self.course_id, self.topic)
 
         self.team = self.create_teams(self.topic, num_teams=1)[0]
         self.team_page = TeamPage(self.browser, self.course_id, team=self.team)
@@ -976,13 +977,16 @@ class DeleteTeamTest(TeamFormActions):
         Then I should see the Delete Team button
         When I click the delete team button
         And I cancel the prompt
-        Then I should remain on the page
+        And I refresh the page
+        Then I should still see the team
         """
-        self.team_page.click_edit_team_button()
-        self.create_edit_delete_team_page.wait_for_page()
-        self.create_edit_delete_team_page.delete_team_button.click()
-        self.create_edit_delete_team_page.cancel_delete_team_dialog()
-        self.assertTrue(self.create_edit_delete_team_page.is_browser_on_page())
+        self.delete_team(cancel=True)
+        self.assertTrue(self.team_management_page.is_browser_on_page())
+        self.browser.refresh()
+        self.assertEqual(
+            ' '.join(('All Topics', self.topic['name'], self.team['name'])),
+            self.team_management_page.header_page_breadcrumbs
+        )
 
     @ddt.data('Moderator', 'Community TA', 'Administrator', None)
     def test_delete_team(self, role):
@@ -1008,13 +1012,31 @@ class DeleteTeamTest(TeamFormActions):
             ).visit()
         self.team_page.visit()
         self.team_page.wait_for_page()
-        self.team_page.click_edit_team_button()
-        self.create_edit_delete_team_page.wait_for_page()
-        self.create_edit_delete_team_page.delete_team_button.click()
-        self.create_edit_delete_team_page.confirm_delete_team_dialog()
+        self.delete_team(require_notification=False)
         browse_teams_page = BrowseTeamsPage(self.browser, self.course_id, self.topic)
         self.assertTrue(browse_teams_page.is_browser_on_page())
         self.assertNotIn(self.team['name'], browse_teams_page.team_names)
+
+    def delete_team(self, **kwargs):
+        """Delete a team. Passes `kwargs` to `confirm_prompt`."""
+        self.team_page.click_edit_team_button()
+        self.team_management_page.wait_for_page()
+        self.team_management_page.delete_team_button.click()
+        confirm_prompt(self.team_management_page, **kwargs)
+
+    def test_delete_team_updates_topics(self):
+        """
+        Scenario: Deleting a team should update the team count on the topics page
+        Given I am staff user for a course with a team
+        And I delete a team
+        When I navigate to the browse topics page
+        Then the team count for the deletd team's topic should be updated
+        """
+        self.delete_team(require_notification=False)
+        BrowseTeamsPage(self.browser, self.course_id, self.topic).click_all_topics_link()
+        topics_page = BrowseTopicsPage(self.browser, self.course_id)
+        self.assertTrue(topics_page.is_browser_on_page())
+        self.assertEqual(topics_page.topic_team_counts[self.topic['name']], 0)
 
 
 @ddt.ddt
@@ -1030,7 +1052,7 @@ class EditTeamTest(TeamFormActions):
             {'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]},
             global_staff=True
         )
-        self.create_edit_delete_team_page = CreateEditDeleteTeamPage(self.browser, self.course_id, self.topic)
+        self.team_management_page = TeamManagementPage(self.browser, self.course_id, self.topic)
 
         self.team = self.create_teams(self.topic, num_teams=1)[0]
         self.team_page = TeamPage(self.browser, self.course_id, team=self.team)
@@ -1071,7 +1093,7 @@ class EditTeamTest(TeamFormActions):
         self.verify_and_navigate_to_edit_team_page()
 
         self.fill_create_or_edit_form()
-        self.create_edit_delete_team_page.submit_form()
+        self.team_management_page.submit_form()
 
         self.team_page.wait_for_page()
 
@@ -1104,7 +1126,7 @@ class EditTeamTest(TeamFormActions):
         self.verify_and_navigate_to_edit_team_page()
 
         self.fill_create_or_edit_form()
-        self.create_edit_delete_team_page.cancel_team()
+        self.team_management_page.cancel_team()
 
         self.team_page.wait_for_page()
 
@@ -1156,7 +1178,7 @@ class EditTeamTest(TeamFormActions):
         self.verify_and_navigate_to_edit_team_page()
 
         self.fill_create_or_edit_form()
-        self.create_edit_delete_team_page.submit_form()
+        self.team_management_page.submit_form()
 
         self.team_page.wait_for_page()
 

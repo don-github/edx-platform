@@ -5,9 +5,9 @@
             'underscore',
             'gettext',
             'teams/js/views/team_utils',
-            'common/js/components/views/feedback_prompt',
+            'common/js/components/utils/view_utils',
             'text!teams/templates/instructor-tools.underscore'],
-        function (Backbone, _, gettext, TeamUtils, PromptView, instructorToolbarTemplate) {
+        function (Backbone, _, gettext, TeamUtils, ViewUtils, instructorToolbarTemplate) {
             return Backbone.View.extend({
 
                 events: {
@@ -19,7 +19,6 @@
                     this.template = _.template(instructorToolbarTemplate);
                     this.team = options.team;
                     this.teamEvents = options.teamEvents;
-                    this.router = options.router;
                 },
 
                 render: function() {
@@ -29,29 +28,12 @@
 
                 deleteTeam: function (event) {
                     event.preventDefault();
-                    var self = this;
-                    var msg = new PromptView.Warning({
-                        title: gettext('Delete this team?'),
-                        message: gettext('Deleting a team removes it from the team listing view, and removes members from the team as well.'),
-                        actions: {
-                            primary: {
-                                text: gettext('Delete'),
-                                class: 'action-delete',
-                                click: function () {
-                                    msg.hide();
-                                    self.handleDelete();
-                                }
-                            },
-                            secondary: {
-                                text: gettext('Close'),
-                                class: 'action-cancel',
-                                click: function () {
-                                    msg.hide();
-                                }
-                            }
-                        }
-                    });
-                    msg.show()
+                    ViewUtils.confirmThenRunOperation(
+                        gettext('Delete this team?'),
+                        gettext('Deleting a team is permanent and cannot be undone. All members are removed from the team, and team discussions can no longer be accessed.'),
+                        gettext('Delete'),
+                        _.bind(this.handleDelete, this)
+                    );
                 },
 
                 editMembership: function (event) {
@@ -67,7 +49,7 @@
                             action: 'delete',
                             team: self.team
                         });
-                        self.router.navigate('topics/' + self.team.get('topic_id'), {trigger: true});
+                        Backbone.history.navigate('topics/' + self.team.get('topic_id'), {trigger: true});
                     });
                 }
             });
