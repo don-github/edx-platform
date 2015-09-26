@@ -1968,6 +1968,9 @@ INSTALLED_APPS = (
     'teams',
 
     'xblock_django',
+
+    # Grades API
+    'grades_api',
 )
 
 ######################### CSRF #########################################
