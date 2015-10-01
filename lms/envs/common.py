@@ -1971,6 +1971,9 @@ INSTALLED_APPS = (
 
     # Grades API
     'grades_api',
+
+    # Accounts API
+    'accounts_api',
 )
 
 ######################### CSRF #########################################
