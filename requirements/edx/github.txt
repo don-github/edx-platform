@@ -67,4 +67,4 @@ git+https://github.com/edx/edx-proctoring.git@0.9.6#egg=edx-proctoring==0.9.6
 # IONISx Grades API (REST)
 -e git+https://github.com/IONISx/edx-grades-api@v1.0.0#egg=edx-grades-api
 
--e git+https://github.com/kencung/edx-accounts-api@v0.0.2#egg=edx-accounts-api
+-e git+https://github.com/kencung/edx-accounts-api@v0.0.1#egg=edx-accounts-api
