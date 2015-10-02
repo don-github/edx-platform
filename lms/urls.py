@@ -90,8 +90,8 @@ urlpatterns = (
     # Grades API endpoints
     url('^api/grades_api/', include('grades_api.urls', namespace='grades_api')),
 
-    # Accounts API endpoints
-    url('^api/accounts_api/', include('accounts_api.urls', namespace='accounts_api')),
+    # TAMS API endpoints
+    url('^api/tams_api/', include('tams_api.urls', namespace='tams_api')),
 )
 
 if settings.FEATURES["ENABLE_COMBINED_LOGIN_REGISTRATION"]:
